@@ -4,28 +4,22 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/*
- * Design system definition.
- *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
- */
+/* GamesMate — Cartoon Casual / Soft Skeuomorphic design system
+   Fonts: Fredoka (primary), Baloo 2 (alt). All colors as oklch.
+*/
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Baloo+2:wght@500;700;800&display=swap");
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
+  --font-display: "Fredoka", "Baloo 2", system-ui, sans-serif;
+  --font-sans: "Fredoka", "Baloo 2", system-ui, sans-serif;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.85rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+  --radius-2xl: 2.25rem;
+  --radius-3xl: 3rem;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -45,100 +39,186 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-ring-offset-background: var(--background);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Brand semantic tokens */
+  --color-brand-red: var(--brand-red);
+  --color-brand-green: var(--brand-green);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-yellow: var(--brand-yellow);
+  --color-violet-deep: var(--violet-deep);
+  --color-violet-mid: var(--violet-mid);
+  --color-cream: var(--cream);
+  --color-beige: var(--beige);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
-}
+  --radius: 1.25rem;
 
-.dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
+  /* Brand palette (from PRD) */
+  --brand-red: oklch(0.66 0.23 27);          /* #FF4040 */
+  --brand-green: oklch(0.81 0.21 130);       /* #8CD000 */
+  --brand-blue: oklch(0.68 0.16 234);        /* #1DA0E5 */
+  --brand-yellow: oklch(0.88 0.17 92);       /* #F4D100 */
+  --violet-deep: oklch(0.22 0.13 305);       /* #2B0B47 */
+  --violet-mid: oklch(0.36 0.17 300);        /* #5A2C8C */
+  --cream: oklch(0.92 0.025 85);             /* #E8E1D2 */
+  --beige: oklch(0.83 0.04 75);              /* #D7C2A3 */
+  --gold: oklch(0.55 0.12 65);               /* #A66B20 */
+  --gold-soft: oklch(0.74 0.08 75);          /* #C7A57A */
+
+  --background: var(--violet-deep);
+  --foreground: oklch(0.98 0.01 90);
+
+  --card: var(--cream);
+  --card-foreground: oklch(0.25 0.05 300);
+
+  --popover: var(--cream);
+  --popover-foreground: oklch(0.25 0.05 300);
+
+  --primary: var(--brand-yellow);
+  --primary-foreground: oklch(0.22 0.13 305);
+
+  --secondary: var(--violet-mid);
+  --secondary-foreground: oklch(0.98 0.01 90);
+
+  --muted: oklch(0.32 0.12 300);
+  --muted-foreground: oklch(0.82 0.05 80);
+
+  --accent: var(--brand-green);
+  --accent-foreground: oklch(0.18 0.08 140);
+
+  --destructive: var(--brand-red);
+  --destructive-foreground: oklch(0.98 0.01 90);
+
+  --border: var(--gold);
+  --input: oklch(0.32 0.12 300);
+  --ring: var(--brand-yellow);
+
+  /* Effects */
+  --shadow-game: 0 6px 0 0 var(--gold), 0 10px 24px -6px rgba(0,0,0,0.45);
+  --shadow-game-sm: 0 4px 0 0 var(--gold), 0 6px 14px -4px rgba(0,0,0,0.4);
+  --shadow-inner-glow: inset 0 2px 0 rgba(255,255,255,0.45), inset 0 -3px 0 rgba(0,0,0,0.15);
+  --gradient-bg: radial-gradient(ellipse at top, var(--violet-mid) 0%, var(--violet-deep) 60%, oklch(0.15 0.1 305) 100%);
+  --gradient-gold: linear-gradient(180deg, oklch(0.85 0.14 85) 0%, var(--brand-yellow) 50%, oklch(0.7 0.16 75) 100%);
+  --gradient-cream: linear-gradient(180deg, oklch(0.96 0.02 85) 0%, var(--cream) 100%);
 }
 
 @layer base {
-  * {
-    border-color: var(--color-border);
-  }
-
+  * { border-color: var(--color-border); }
+  html, body { font-family: var(--font-display); }
   body {
-    background-color: var(--color-background);
+    background: var(--gradient-bg);
+    background-attachment: fixed;
     color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.2);
+  }
+  h1, h2, h3, h4 {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-shadow: 0 2px 0 rgba(0,0,0,0.25);
   }
 }
+
+@layer components {
+  /* Glossy gamified panel (cream surface w/ gold borders) */
+  .panel-game {
+    background: var(--gradient-cream);
+    color: var(--card-foreground);
+    border: 3px solid var(--gold);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-game), var(--shadow-inner-glow);
+    position: relative;
+  }
+  .panel-game::before {
+    content: "";
+    position: absolute; inset: 4px;
+    border-radius: calc(var(--radius-xl) - 4px);
+    border: 2px solid var(--gold-soft);
+    pointer-events: none;
+  }
+
+  .panel-violet {
+    background: linear-gradient(180deg, var(--violet-mid) 0%, var(--violet-deep) 100%);
+    border: 3px solid var(--gold);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-game), var(--shadow-inner-glow);
+    color: var(--foreground);
+  }
+
+  /* Glossy game button */
+  .btn-game {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 0.85rem 1.5rem;
+    border-radius: 999px;
+    border: 3px solid var(--gold);
+    color: var(--primary-foreground);
+    background: var(--gradient-gold);
+    box-shadow: var(--shadow-game-sm), var(--shadow-inner-glow);
+    transition: transform 120ms ease, box-shadow 120ms ease;
+    cursor: pointer;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+  }
+  .btn-game:hover { transform: translateY(-2px) scale(1.02); }
+  .btn-game:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--gold), 0 2px 6px rgba(0,0,0,0.4); }
+
+  .btn-game-red    { background: linear-gradient(180deg, oklch(0.78 0.2 27) 0%, var(--brand-red) 100%); color: white; text-shadow: 0 1px 0 rgba(0,0,0,0.3); }
+  .btn-game-green  { background: linear-gradient(180deg, oklch(0.88 0.2 130) 0%, var(--brand-green) 100%); color: oklch(0.18 0.08 140); }
+  .btn-game-blue   { background: linear-gradient(180deg, oklch(0.8 0.14 234) 0%, var(--brand-blue) 100%); color: white; text-shadow: 0 1px 0 rgba(0,0,0,0.3); }
+  .btn-game-violet { background: linear-gradient(180deg, var(--violet-mid) 0%, var(--violet-deep) 100%); color: white; text-shadow: 0 1px 0 rgba(0,0,0,0.3); }
+
+  .badge-game {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    background: var(--gradient-gold);
+    border: 2px solid var(--gold);
+    color: var(--primary-foreground);
+    font-weight: 700;
+    font-size: 0.8rem;
+    box-shadow: var(--shadow-inner-glow);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+  }
+
+  .chip-sport {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    border: 2px solid rgba(255,255,255,0.18);
+    color: white;
+    font-weight: 600;
+    font-size: 0.85rem;
+    backdrop-filter: blur(8px);
+  }
+
+  .heading-hero {
+    font-size: clamp(2.5rem, 6vw, 4.75rem);
+    line-height: 0.95;
+    font-weight: 700;
+    text-shadow: 0 4px 0 rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.4);
+  }
+
+  .text-stroke-gold {
+    -webkit-text-stroke: 2px var(--gold);
+  }
+}
+
+@keyframes bounce-in {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.animate-bounce-in { animation: bounce-in 500ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-12px) rotate(2deg); }
+}
+.animate-float { animation: float-slow 4s ease-in-out infinite; }
