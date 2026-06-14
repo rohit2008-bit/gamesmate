@@ -12,9 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as MySportsRouteImport } from './routes/my-sports'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ApproveRequestsRouteImport } from './routes/approve-requests'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -33,6 +36,16 @@ const PricingRoute = PricingRouteImport.update({
   path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MySportsRoute = MySportsRouteImport.update({
+  id: '/my-sports',
+  path: '/my-sports',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DiscoverRoute = DiscoverRouteImport.update({
   id: '/discover',
   path: '/discover',
@@ -46,6 +59,11 @@ const ContactRoute = ContactRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApproveRequestsRoute = ApproveRequestsRouteImport.update({
+  id: '/approve-requests',
+  path: '/approve-requests',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -62,9 +80,12 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/approve-requests': typeof ApproveRequestsRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/discover': typeof DiscoverRoute
+  '/my-sports': typeof MySportsRoute
+  '/notifications': typeof NotificationsRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -72,9 +93,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/approve-requests': typeof ApproveRequestsRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/discover': typeof DiscoverRoute
+  '/my-sports': typeof MySportsRoute
+  '/notifications': typeof NotificationsRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -83,9 +107,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/approve-requests': typeof ApproveRequestsRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/discover': typeof DiscoverRoute
+  '/my-sports': typeof MySportsRoute
+  '/notifications': typeof NotificationsRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -95,9 +122,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/approve-requests'
     | '/auth'
     | '/contact'
     | '/discover'
+    | '/my-sports'
+    | '/notifications'
     | '/pricing'
     | '/profile'
     | '/sitemap.xml'
@@ -105,9 +135,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/approve-requests'
     | '/auth'
     | '/contact'
     | '/discover'
+    | '/my-sports'
+    | '/notifications'
     | '/pricing'
     | '/profile'
     | '/sitemap.xml'
@@ -115,9 +148,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/approve-requests'
     | '/auth'
     | '/contact'
     | '/discover'
+    | '/my-sports'
+    | '/notifications'
     | '/pricing'
     | '/profile'
     | '/sitemap.xml'
@@ -126,9 +162,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  ApproveRequestsRoute: typeof ApproveRequestsRoute
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
   DiscoverRoute: typeof DiscoverRoute
+  MySportsRoute: typeof MySportsRoute
+  NotificationsRoute: typeof NotificationsRoute
   PricingRoute: typeof PricingRoute
   ProfileRoute: typeof ProfileRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -157,6 +196,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-sports': {
+      id: '/my-sports'
+      path: '/my-sports'
+      fullPath: '/my-sports'
+      preLoaderRoute: typeof MySportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/discover': {
       id: '/discover'
       path: '/discover'
@@ -176,6 +229,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/approve-requests': {
+      id: '/approve-requests'
+      path: '/approve-requests'
+      fullPath: '/approve-requests'
+      preLoaderRoute: typeof ApproveRequestsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -198,9 +258,12 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  ApproveRequestsRoute: ApproveRequestsRoute,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
   DiscoverRoute: DiscoverRoute,
+  MySportsRoute: MySportsRoute,
+  NotificationsRoute: NotificationsRoute,
   PricingRoute: PricingRoute,
   ProfileRoute: ProfileRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

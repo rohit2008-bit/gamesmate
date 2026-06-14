@@ -1,20 +1,48 @@
 import { Link } from "@tanstack/react-router";
-import { Trophy, LogOut, User } from "lucide-react";
+import { Trophy, Bell } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useState, useEffect } from "react";
+import { db } from "@/lib/supabase-db";
 
 export function SiteHeader() {
-  const { user, loading, signOut } = useAuth();
+  const { user, loading } = useAuth();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (user) {
+      db.getNotifications(user.id).then((notifs) => {
+        setUnreadCount(notifs.filter((n) => !n.is_read).length);
+      });
+    }
+  }, [user]);
 
   // Extract initials or name
   const displayName = user?.user_metadata?.name || user?.email?.split("@")[0] || "Player";
   const userInitials = displayName.substring(0, 2).toUpperCase();
 
+  // Define navigation links based on authentication state
+  const baseLinks = [
+    { to: "/", label: "Home" },
+    { to: "/discover", label: "Discover" },
+    { to: "/pricing", label: "Pricing" },
+  ];
+  const authLinks = user
+    ? [
+        { to: "/my-sports", label: "My Sports" },
+        { to: "/approve-requests", label: "Approve Requests" },
+      ]
+    : [
+        { to: "/about", label: "About" },
+        { to: "/contact", label: "Contact" },
+      ];
+  const navLinks = [...baseLinks, ...authLinks];
+
   return (
     <header className="sticky top-0 z-40 px-4 pt-4">
       <div className="mx-auto max-w-6xl panel-violet flex items-center justify-between gap-4 px-5 py-3">
         <Link to="/" className="flex items-center gap-2 relative z-10">
-          <div className="grid place-items-center w-10 h-10 rounded-2xl bg-[var(--gradient-gold)] border-2 border-[var(--gold)] shadow-[var(--shadow-inner-glow)]">
-            <Trophy className="w-5 h-5 text-[var(--primary-foreground)]" />
+          <div className="flex items-center justify-center w-10 h-10 overflow-hidden">
+            <img src="/logo.png" alt="GamesMate Logo" className="w-full h-full object-contain" />
           </div>
           <span className="font-display font-bold text-xl tracking-tight">
             GAMES<span className="text-[var(--brand-yellow)]">MATE</span>
@@ -22,13 +50,7 @@ export function SiteHeader() {
         </Link>
         
         <nav className="hidden md:flex items-center gap-1 relative z-10">
-          {[
-            { to: "/", label: "Home" },
-            { to: "/discover", label: "Discover" },
-            { to: "/pricing", label: "Pricing" },
-            { to: "/about", label: "About" },
-            { to: "/contact", label: "Contact" },
-          ].map((l) => (
+          {navLinks.map((l) => (
             <Link
               key={l.to}
               to={l.to}
@@ -45,17 +67,22 @@ export function SiteHeader() {
           {loading ? (
             <div className="h-9 w-20 animate-pulse bg-white/10 rounded-full" />
           ) : user ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              <Link
+                to="/notifications"
+                className="relative p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-full transition border border-white/15"
+                title="Notifications"
+              >
+                <Bell className="w-5 h-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-[var(--brand-red)] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-[var(--violet-deep)]">
+                    {unreadCount}
+                  </span>
+                )}
+              </Link>
               <Link to="/profile" className="btn-game btn-game-blue !py-2 !px-5 !text-sm">
                 My Profile
               </Link>
-              <button
-                onClick={signOut}
-                className="w-9 h-9 rounded-full bg-white/5 border border-white/15 grid place-items-center text-white/80 hover:bg-white/10 hover:text-white transition cursor-pointer"
-                title="Sign Out"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
             </div>
           ) : (
             <Link to="/auth" className="btn-game btn-game-green !py-2 !px-5 !text-sm">
