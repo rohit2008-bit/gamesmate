@@ -41,29 +41,20 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3 relative z-10">
+        <div className="flex items-center gap-2 relative z-10">
           {loading ? (
             <div className="h-9 w-20 animate-pulse bg-white/10 rounded-full" />
           ) : user ? (
-            <div className="flex items-center gap-3">
-              {/* User Avatar & Name */}
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-                <div className="w-6 h-6 rounded-full bg-[var(--gradient-gold)] border border-[var(--gold)] grid place-items-center text-[10px] font-extrabold text-[var(--primary-foreground)]">
-                  {userInitials}
-                </div>
-                <span className="text-xs font-bold text-white/90 hidden sm:inline-block max-w-[100px] truncate">
-                  {displayName}
-                </span>
-              </div>
-              
-              {/* Logout Button */}
+            <div className="flex items-center gap-2">
+              <Link to="/profile" className="btn-game btn-game-blue !py-2 !px-5 !text-sm">
+                My Profile
+              </Link>
               <button
                 onClick={signOut}
-                className="btn-game btn-game-red !py-1.5 !px-3 !text-xs flex items-center gap-1"
+                className="w-9 h-9 rounded-full bg-white/5 border border-white/15 grid place-items-center text-white/80 hover:bg-white/10 hover:text-white transition cursor-pointer"
                 title="Sign Out"
               >
-                <LogOut className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Sign Out</span>
+                <LogOut className="w-4 h-4" />
               </button>
             </div>
           ) : (
