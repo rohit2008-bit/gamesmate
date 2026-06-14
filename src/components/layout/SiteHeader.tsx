@@ -32,7 +32,7 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <Link to="/discover" className="btn-game btn-game-green relative z-10 !py-2 !px-5 !text-sm">
+        <Link to="/auth" className="btn-game btn-game-green relative z-10 !py-2 !px-5 !text-sm">
           Play Now
         </Link>
       </div>

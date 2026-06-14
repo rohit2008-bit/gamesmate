@@ -54,7 +54,7 @@ function Landing() {
               Create matches, run tournaments, track live scores, and earn your Mate Score.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link to="/discover" className="btn-game btn-game-green"><Trophy className="w-5 h-5" /> Start Playing</Link>
+              <Link to="/auth" className="btn-game btn-game-green"><Trophy className="w-5 h-5" /> Start Playing</Link>
               <Link to="/pricing" className="btn-game btn-game-violet"><Crown className="w-5 h-5" /> Go Pro</Link>
             </div>
             <div className="mt-6 flex flex-wrap gap-2">
