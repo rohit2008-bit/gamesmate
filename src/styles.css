@@ -7,7 +7,7 @@
 /* GamesMate — Cartoon Casual / Soft Skeuomorphic design system
    Fonts: Fredoka (primary), Baloo 2 (alt). All colors as oklch.
 */
-@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Baloo+2:wght@500;700;800&display=swap");
+
 
 @theme inline {
   --font-display: "Fredoka", "Baloo 2", system-ui, sans-serif;
