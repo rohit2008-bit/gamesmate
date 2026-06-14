@@ -1,9 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Trophy, Mail, Lock, User, Sparkles, ArrowRight, Shield } from "lucide-react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -26,7 +27,16 @@ function Auth() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleAuth = (e: React.FormEvent) => {
+  // Redirect if user is already signed in
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate({ to: "/discover" });
+      }
+    });
+  }, [navigate]);
+
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email || !password) {
@@ -60,37 +70,80 @@ function Auth() {
       },
     });
 
-    setTimeout(() => {
-      setLoading(false);
-      toast.success(
-        mode === "signin"
-          ? "Welcome back to GamesMate! 🏆"
-          : "Account created successfully! Let's play! 🎉",
-        {
+    try {
+      if (mode === "signin") {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) throw error;
+
+        toast.success("Welcome back to GamesMate! 🏆", {
           style: {
             background: "var(--brand-green)",
             color: "var(--violet-deep)",
             border: "2px solid var(--gold)",
             fontWeight: "bold",
           },
-        }
-      );
-      
-      // Redirect to discover page after login
-      navigate({ to: "/discover" });
-    }, 1200);
+        });
+        navigate({ to: "/discover" });
+      } else {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              name,
+              preferred_sport: sport,
+            },
+          },
+        });
+
+        if (error) throw error;
+
+        toast.success("Account created successfully! Check your email to confirm or start playing! 🎉", {
+          style: {
+            background: "var(--brand-green)",
+            color: "var(--violet-deep)",
+            border: "2px solid var(--gold)",
+            fontWeight: "bold",
+          },
+        });
+        navigate({ to: "/discover" });
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Authentication failed", {
+        style: {
+          background: "var(--brand-red)",
+          color: "white",
+          border: "2px solid var(--gold)",
+        },
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSocialAuth = (provider: "Google" | "Apple") => {
-    toast.success(`Connected with ${provider} successfully!`, {
-      style: {
-        background: "var(--brand-green)",
-        color: "var(--violet-deep)",
-        border: "2px solid var(--gold)",
-        fontWeight: "bold",
-      },
-    });
-    navigate({ to: "/discover" });
+  const handleSocialAuth = async (provider: "Google" | "Apple") => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: provider.toLowerCase() as "google" | "apple",
+        options: {
+          redirectTo: `${window.location.origin}/discover`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : `Connection to ${provider} failed`, {
+        style: {
+          background: "var(--brand-red)",
+          color: "white",
+          border: "2px solid var(--gold)",
+        },
+      });
+    }
   };
 
   const sportsOptions = ["Cricket", "Football", "Basketball", "Volleyball", "Badminton"];

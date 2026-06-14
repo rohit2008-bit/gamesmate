@@ -1,7 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import { Trophy } from "lucide-react";
+import { Trophy, LogOut, User } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 export function SiteHeader() {
+  const { user, loading, signOut } = useAuth();
+
+  // Extract initials or name
+  const displayName = user?.user_metadata?.name || user?.email?.split("@")[0] || "Player";
+  const userInitials = displayName.substring(0, 2).toUpperCase();
+
   return (
     <header className="sticky top-0 z-40 px-4 pt-4">
       <div className="mx-auto max-w-6xl panel-violet flex items-center justify-between gap-4 px-5 py-3">
@@ -13,6 +20,7 @@ export function SiteHeader() {
             GAMES<span className="text-[var(--brand-yellow)]">MATE</span>
           </span>
         </Link>
+        
         <nav className="hidden md:flex items-center gap-1 relative z-10">
           {[
             { to: "/", label: "Home" },
@@ -32,9 +40,38 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <Link to="/auth" className="btn-game btn-game-green relative z-10 !py-2 !px-5 !text-sm">
-          Play Now
-        </Link>
+
+        <div className="flex items-center gap-3 relative z-10">
+          {loading ? (
+            <div className="h-9 w-20 animate-pulse bg-white/10 rounded-full" />
+          ) : user ? (
+            <div className="flex items-center gap-3">
+              {/* User Avatar & Name */}
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+                <div className="w-6 h-6 rounded-full bg-[var(--gradient-gold)] border border-[var(--gold)] grid place-items-center text-[10px] font-extrabold text-[var(--primary-foreground)]">
+                  {userInitials}
+                </div>
+                <span className="text-xs font-bold text-white/90 hidden sm:inline-block max-w-[100px] truncate">
+                  {displayName}
+                </span>
+              </div>
+              
+              {/* Logout Button */}
+              <button
+                onClick={signOut}
+                className="btn-game btn-game-red !py-1.5 !px-3 !text-xs flex items-center gap-1"
+                title="Sign Out"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Sign Out</span>
+              </button>
+            </div>
+          ) : (
+            <Link to="/auth" className="btn-game btn-game-green !py-2 !px-5 !text-sm">
+              Play Now
+            </Link>
+          )}
+        </div>
       </div>
     </header>
   );
