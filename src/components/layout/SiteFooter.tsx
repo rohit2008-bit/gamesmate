@@ -8,8 +8,8 @@ export function SiteFooter() {
         <div className="relative z-10 grid gap-8 md:grid-cols-4">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-3">
-              <div className="grid place-items-center w-10 h-10 rounded-2xl bg-[var(--gradient-gold)] border-2 border-[var(--gold)]">
-                <Trophy className="w-5 h-5 text-[var(--primary-foreground)]" />
+              <div className="flex items-center justify-center w-10 h-10 overflow-hidden">
+                <img src="/logo.png" alt="GamesMate Logo" className="w-full h-full object-contain" />
               </div>
               <span className="font-display font-bold text-xl">
                 GAMES<span className="text-[var(--brand-yellow)]">MATE</span>

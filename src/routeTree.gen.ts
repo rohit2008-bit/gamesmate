@@ -10,10 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SearchUsersRouteImport } from './routes/search-users'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as MySportsRouteImport } from './routes/my-sports'
+import { Route as FriendsRouteImport } from './routes/friends'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -24,6 +26,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchUsersRoute = SearchUsersRouteImport.update({
+  id: '/search-users',
+  path: '/search-users',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -44,6 +51,11 @@ const NotificationsRoute = NotificationsRouteImport.update({
 const MySportsRoute = MySportsRouteImport.update({
   id: '/my-sports',
   path: '/my-sports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FriendsRoute = FriendsRouteImport.update({
+  id: '/friends',
+  path: '/friends',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiscoverRoute = DiscoverRouteImport.update({
@@ -84,10 +96,12 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/discover': typeof DiscoverRoute
+  '/friends': typeof FriendsRoute
   '/my-sports': typeof MySportsRoute
   '/notifications': typeof NotificationsRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
+  '/search-users': typeof SearchUsersRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
 }
 export interface FileRoutesByTo {
@@ -97,10 +111,12 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/discover': typeof DiscoverRoute
+  '/friends': typeof FriendsRoute
   '/my-sports': typeof MySportsRoute
   '/notifications': typeof NotificationsRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
+  '/search-users': typeof SearchUsersRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
 }
 export interface FileRoutesById {
@@ -111,10 +127,12 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/discover': typeof DiscoverRoute
+  '/friends': typeof FriendsRoute
   '/my-sports': typeof MySportsRoute
   '/notifications': typeof NotificationsRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
+  '/search-users': typeof SearchUsersRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
 }
 export interface FileRouteTypes {
@@ -126,10 +144,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/discover'
+    | '/friends'
     | '/my-sports'
     | '/notifications'
     | '/pricing'
     | '/profile'
+    | '/search-users'
     | '/sitemap.xml'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -139,10 +159,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/discover'
+    | '/friends'
     | '/my-sports'
     | '/notifications'
     | '/pricing'
     | '/profile'
+    | '/search-users'
     | '/sitemap.xml'
   id:
     | '__root__'
@@ -152,10 +174,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/discover'
+    | '/friends'
     | '/my-sports'
     | '/notifications'
     | '/pricing'
     | '/profile'
+    | '/search-users'
     | '/sitemap.xml'
   fileRoutesById: FileRoutesById
 }
@@ -166,10 +190,12 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
   DiscoverRoute: typeof DiscoverRoute
+  FriendsRoute: typeof FriendsRoute
   MySportsRoute: typeof MySportsRoute
   NotificationsRoute: typeof NotificationsRoute
   PricingRoute: typeof PricingRoute
   ProfileRoute: typeof ProfileRoute
+  SearchUsersRoute: typeof SearchUsersRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
@@ -180,6 +206,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search-users': {
+      id: '/search-users'
+      path: '/search-users'
+      fullPath: '/search-users'
+      preLoaderRoute: typeof SearchUsersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -208,6 +241,13 @@ declare module '@tanstack/react-router' {
       path: '/my-sports'
       fullPath: '/my-sports'
       preLoaderRoute: typeof MySportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/friends': {
+      id: '/friends'
+      path: '/friends'
+      fullPath: '/friends'
+      preLoaderRoute: typeof FriendsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/discover': {
@@ -262,10 +302,12 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
   DiscoverRoute: DiscoverRoute,
+  FriendsRoute: FriendsRoute,
   MySportsRoute: MySportsRoute,
   NotificationsRoute: NotificationsRoute,
   PricingRoute: PricingRoute,
   ProfileRoute: ProfileRoute,
+  SearchUsersRoute: SearchUsersRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport

@@ -6,6 +6,13 @@ import { MapPin, Calendar, Users, Trophy, Filter, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { db, JoinRequest } from "@/lib/supabase-db";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const Route = createFileRoute("/discover")({
   head: () => ({
@@ -20,10 +27,13 @@ export const Route = createFileRoute("/discover")({
 const items = [
   { kind: "Match", sport: "Cricket", title: "Sunday Smash Cup", host: "Royal Stags", city: "Mumbai", date: "Sun, 22 Jun · 4:00 PM", players: "10/22", venue: "Outdoor", color: "bg-[var(--brand-green)]" },
   { kind: "Tournament", sport: "Football", title: "Monsoon League 2026", host: "City Sports Club", city: "Bengaluru", date: "Reg. ends 28 Jun", players: "12 teams", venue: "Outdoor", color: "bg-[var(--brand-blue)]" },
-  { kind: "Match", sport: "Basketball", title: "Friday Night Hoops", host: "Hoop Squad", city: "Pune", date: "Fri, 20 Jun · 8:30 PM", players: "6/10", venue: "Indoor", color: "bg-[var(--brand-red)]" },
-  { kind: "Match", sport: "Badminton", title: "Doubles Showdown", host: "Smash Mates", city: "Delhi", date: "Sat, 21 Jun · 7:00 AM", players: "2/4", venue: "Indoor", color: "bg-[var(--brand-yellow)]" },
+  { kind: "Match", sport: "Basketball", title: "Friday Night Hoops", host: "Hoop Squad", city: "Pune", date: "Fri, 20 Jun · 8:30 PM", players: "6/10", venue: "Outdoor", color: "bg-[var(--brand-red)]" },
+  { kind: "Match", sport: "Badminton", title: "Doubles Showdown", host: "Smash Mates", city: "Delhi", date: "Sat, 21 Jun · 7:00 AM", players: "2/4", venue: "Outdoor", color: "bg-[var(--brand-yellow)]" },
   { kind: "Tournament", sport: "Volleyball", title: "Beach Battle", host: "Coastal Crew", city: "Goa", date: "Reg. ends 5 Jul", players: "8 teams", venue: "Outdoor", color: "bg-[var(--brand-blue)]" },
   { kind: "Match", sport: "Cricket", title: "Corporate Clash T10", host: "Office League", city: "Hyderabad", date: "Sun, 29 Jun · 9:00 AM", players: "18/22", venue: "Outdoor", color: "bg-[var(--brand-green)]" },
+  { kind: "Tournament", sport: "Table Tennis", title: "Spin Masters", host: "TT Club", city: "Chennai", date: "Sat, 28 Jun · 10:00 AM", players: "16 players", venue: "Indoor", color: "bg-[var(--brand-blue)]" },
+  { kind: "Match", sport: "Chess", title: "Grandmaster Challenge", host: "Checkmate Lounge", city: "Pune", date: "Sun, 29 Jun · 4:00 PM", players: "2/2", venue: "Indoor", color: "bg-[var(--violet-mid)]" },
+  { kind: "Match", sport: "Carrom", title: "Board Strikers", host: "Local Hub", city: "Mumbai", date: "Fri, 27 Jun · 7:30 PM", players: "4/4", venue: "Indoor", color: "bg-[var(--brand-yellow)]" },
 ];
 
 function Discover() {
@@ -31,7 +41,6 @@ function Discover() {
   const navigate = useNavigate();
   const [filterKind, setFilterKind] = useState("All");
   const [filterSport, setFilterSport] = useState("All");
-  const [filterVenue, setFilterVenue] = useState("All");
   const [joinRequests, setJoinRequests] = useState<JoinRequest[]>([]);
   const [submittingId, setSubmittingId] = useState<string | null>(null);
 
@@ -101,9 +110,11 @@ function Discover() {
   };
 
   const filteredItems = items.filter((item) => {
-    if (filterKind !== "All" && item.kind + "s" !== filterKind) return false;
+    if (filterKind !== "All") {
+      if (filterKind === "Matches" && item.kind !== "Match") return false;
+      if (filterKind === "Tournaments" && item.kind !== "Tournament") return false;
+    }
     if (filterSport !== "All" && item.sport !== filterSport) return false;
-    if (filterVenue !== "All" && item.venue !== filterVenue) return false;
     return true;
   });
 
@@ -118,38 +129,58 @@ function Discover() {
       </section>
 
       <section className="px-4 pb-6">
-        <div className="mx-auto max-w-6xl panel-violet p-4 md:p-5">
-          <div className="relative z-10 flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-2 text-white/80 font-semibold mr-2"><Filter className="w-4 h-4" /> Filters</div>
-            {["All", "Matches", "Tournaments"].map((t) => (
-              <button 
-                key={t} 
-                onClick={() => setFilterKind(t)}
-                className={`chip-sport ${filterKind === t ? "!bg-[var(--brand-yellow)] !text-[color:var(--primary-foreground)] !border-[var(--gold)]" : ""}`}
-              >
-                {t}
-              </button>
-            ))}
-            <span className="w-px h-6 bg-white/15 mx-2" />
-            {["All", "Cricket", "Football", "Basketball", "Volleyball", "Badminton"].map((s) => (
-              <button 
-                key={s} 
-                onClick={() => setFilterSport(s)}
-                className={`chip-sport ${filterSport === s ? "!bg-[var(--brand-yellow)] !text-[color:var(--primary-foreground)] !border-[var(--gold)]" : ""}`}
-              >
-                {s}
-              </button>
-            ))}
-            <span className="w-px h-6 bg-white/15 mx-2" />
-            {["All", "Indoor", "Outdoor"].map((s) => (
-              <button 
-                key={s} 
-                onClick={() => setFilterVenue(s)}
-                className={`chip-sport ${filterVenue === s ? "!bg-[var(--brand-yellow)] !text-[color:var(--primary-foreground)] !border-[var(--gold)]" : ""}`}
-              >
-                {s}
-              </button>
-            ))}
+        <div className="mx-auto max-w-6xl panel-violet p-5 md:p-6">
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2 text-[var(--brand-yellow)] font-bold text-lg">
+                <Filter className="w-5 h-5" /> 
+                Refine Search
+              </div>
+              {(filterKind !== "All" || filterSport !== "All") && (
+                <button
+                  onClick={() => {
+                    setFilterKind("All");
+                    setFilterSport("All");
+                  }}
+                  className="text-xs font-bold text-white/60 hover:text-white underline decoration-dashed underline-offset-4"
+                >
+                  Clear Filters
+                </button>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Event Type Filter */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-white/80 uppercase tracking-wider">Event Type</label>
+                <Select value={filterKind} onValueChange={setFilterKind}>
+                  <SelectTrigger className="w-full rounded-xl border-2 border-[var(--gold)] bg-[var(--violet-deep)] px-4 py-2.5 text-sm text-white font-semibold focus:outline-none focus:ring-2 focus:ring-[var(--brand-yellow)] shadow-[var(--shadow-inner-glow)] cursor-pointer h-auto">
+                    <SelectValue placeholder="All Events" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[var(--violet-deep)] border-2 border-[var(--gold)] text-white rounded-xl shadow-[var(--shadow-game)] z-50">
+                    <SelectItem value="All" className="focus:bg-[var(--brand-yellow)] focus:text-[var(--violet-deep)] cursor-pointer py-2 rounded-md font-semibold">All Events</SelectItem>
+                    <SelectItem value="Matches" className="focus:bg-[var(--brand-yellow)] focus:text-[var(--violet-deep)] cursor-pointer py-2 rounded-md font-semibold">Matches Only</SelectItem>
+                    <SelectItem value="Tournaments" className="focus:bg-[var(--brand-yellow)] focus:text-[var(--violet-deep)] cursor-pointer py-2 rounded-md font-semibold">Tournaments Only</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Sport Filter */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-white/80 uppercase tracking-wider">Sport</label>
+                <Select value={filterSport} onValueChange={setFilterSport}>
+                  <SelectTrigger className="w-full rounded-xl border-2 border-[var(--gold)] bg-[var(--violet-deep)] px-4 py-2.5 text-sm text-white font-semibold focus:outline-none focus:ring-2 focus:ring-[var(--brand-yellow)] shadow-[var(--shadow-inner-glow)] cursor-pointer h-auto">
+                    <SelectValue placeholder="All Sports" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[var(--violet-deep)] border-2 border-[var(--gold)] text-white rounded-xl shadow-[var(--shadow-game)] z-50">
+                    <SelectItem value="All" className="focus:bg-[var(--brand-yellow)] focus:text-[var(--violet-deep)] cursor-pointer py-2 rounded-md font-semibold">All Sports</SelectItem>
+                    {["Cricket", "Football", "Basketball", "Volleyball", "Badminton", "Table Tennis", "Chess", "Carrom"].map((s) => (
+                      <SelectItem key={s} value={s} className="focus:bg-[var(--brand-yellow)] focus:text-[var(--violet-deep)] cursor-pointer py-2 rounded-md font-semibold">{s}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
         </div>
       </section>

@@ -24,6 +24,28 @@ export interface DbNotification {
   created_at: string;
 }
 
+export interface FriendRequest {
+  id: string;
+  sender_id: string;
+  receiver_id: string;
+  status: "pending" | "accepted" | "rejected";
+  created_at: string;
+  sender_profile?: any;
+  receiver_profile?: any;
+}
+
+export interface UnifiedRequest {
+  id: string;
+  type: "match" | "tournament" | "friend";
+  title: string;
+  subtitle: string;
+  status: "pending" | "approved" | "rejected";
+  requester_id: string;
+  requester_name: string;
+  created_at: string;
+  isIncoming: boolean;
+}
+
 export const db = {
   // Notifications
   async getNotifications(userId: string): Promise<DbNotification[]> {
@@ -212,6 +234,72 @@ export const db = {
 
     if (error) {
       console.error("Error updating join request status:", error);
+    }
+  },
+
+  // Friends System
+  async searchUsers(query: string, currentUserId: string): Promise<any[]> {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .neq("id", currentUserId)
+      .or(`name.ilike.%${query}%,game_uid.ilike.%${query}%`)
+      .limit(20);
+
+    if (error) {
+      console.error("Error searching users:", error);
+      return [];
+    }
+    return data || [];
+  },
+
+  async sendFriendRequest(senderId: string, receiverId: string): Promise<void> {
+    const { error } = await supabase.from("friend_requests").insert([
+      {
+        sender_id: senderId,
+        receiver_id: receiverId,
+        status: "pending",
+      },
+    ]);
+
+    if (error) {
+      console.error("Error sending friend request:", error);
+    }
+  },
+
+  async getFriendRequests(userId: string): Promise<FriendRequest[]> {
+    // Fetch requests where user is either sender or receiver
+    const { data, error } = await supabase
+      .from("friend_requests")
+      .select(`
+        *,
+        sender:sender_id(*),
+        receiver:receiver_id(*)
+      `)
+      .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching friend requests:", error);
+      return [];
+    }
+    
+    // Map the joined data
+    return (data || []).map(req => ({
+      ...req,
+      sender_profile: req.sender,
+      receiver_profile: req.receiver
+    }));
+  },
+
+  async respondToFriendRequest(requestId: string, status: "accepted" | "rejected"): Promise<void> {
+    const { error } = await supabase
+      .from("friend_requests")
+      .update({ status })
+      .eq("id", requestId);
+
+    if (error) {
+      console.error("Error responding to friend request:", error);
     }
   }
 };

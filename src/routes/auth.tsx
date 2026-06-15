@@ -183,7 +183,7 @@ function Auth() {
     }
   };
 
-  const sportsOptions = ["Cricket", "Football", "Basketball", "Volleyball", "Badminton"];
+  const sportsOptions = ["Cricket", "Football", "Basketball", "Volleyball", "Badminton", "Table Tennis", "Chess", "Carrom"];
 
   return (
     <div className="min-h-screen flex flex-col justify-between">

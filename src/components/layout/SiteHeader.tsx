@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Trophy, Bell } from "lucide-react";
+import { Trophy, Bell, User, UserPlus } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useState, useEffect } from "react";
 import { db } from "@/lib/supabase-db";
@@ -21,21 +21,21 @@ export function SiteHeader() {
   const userInitials = displayName.substring(0, 2).toUpperCase();
 
   // Define navigation links based on authentication state
-  const baseLinks = [
-    { to: "/", label: "Home" },
-    { to: "/discover", label: "Discover" },
-    { to: "/pricing", label: "Pricing" },
-  ];
-  const authLinks = user
+  const navLinks = user
     ? [
+        { to: "/discover", label: "Discover" },
+        { to: "/pricing", label: "Pricing" },
         { to: "/my-sports", label: "My Sports" },
         { to: "/approve-requests", label: "Approve Requests" },
+        { to: "/friends", label: "Friends" },
       ]
     : [
+        { to: "/", label: "Home" },
+        { to: "/discover", label: "Discover" },
+        { to: "/pricing", label: "Pricing" },
         { to: "/about", label: "About" },
         { to: "/contact", label: "Contact" },
       ];
-  const navLinks = [...baseLinks, ...authLinks];
 
   return (
     <header className="sticky top-0 z-40 px-4 pt-4">
@@ -69,6 +69,13 @@ export function SiteHeader() {
           ) : user ? (
             <div className="flex items-center gap-3">
               <Link
+                to="/search-users"
+                className="relative p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-full transition border border-white/15"
+                title="Search Friends"
+              >
+                <UserPlus className="w-5 h-5" />
+              </Link>
+              <Link
                 to="/notifications"
                 className="relative p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-full transition border border-white/15"
                 title="Notifications"
@@ -80,8 +87,12 @@ export function SiteHeader() {
                   </span>
                 )}
               </Link>
-              <Link to="/profile" className="btn-game btn-game-blue !py-2 !px-5 !text-sm">
-                My Profile
+              <Link 
+                to="/profile" 
+                className="grid place-items-center w-10 h-10 rounded-full border-2 border-[var(--gold)] bg-[var(--brand-blue)] text-white shadow-[var(--shadow-inner-glow)] transition hover:scale-105 hover:-translate-y-0.5"
+                title="My Profile"
+              >
+                <User className="w-5 h-5" />
               </Link>
             </div>
           ) : (

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { supabase } from "@/lib/supabase";
-import { db, JoinRequest } from "@/lib/supabase-db";
+import { db, JoinRequest, FriendRequest, UnifiedRequest } from "@/lib/supabase-db";
 import { Trophy, Check, X, ShieldAlert, Users, Calendar, MapPin, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -15,14 +15,51 @@ function ApproveRequests() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const [requests, setRequests] = useState<JoinRequest[]>([]);
+  const [requests, setRequests] = useState<UnifiedRequest[]>([]);
   const [fetching, setFetching] = useState(true);
   const [actioningId, setActioningId] = useState<string | null>(null);
 
   const fetchRequests = async () => {
+    if (!user) return;
     setFetching(true);
-    const data = await db.getJoinRequests();
-    setRequests(data);
+    
+    const [joinData, friendData] = await Promise.all([
+      db.getJoinRequests(),
+      db.getFriendRequests(user.id)
+    ]);
+    
+    const unifiedJoinRequests: UnifiedRequest[] = joinData.map(r => ({
+      id: r.id,
+      type: r.type,
+      title: r.title,
+      subtitle: `${r.sport} • ${r.city} (${r.venue}) • ${r.date}`,
+      status: r.status,
+      requester_id: r.requester_id,
+      requester_name: r.requester_name,
+      created_at: r.created_at || new Date().toISOString(),
+      isIncoming: r.requester_id !== user.id // Mock join requests act like incoming unless user is requester
+    }));
+
+    const unifiedFriendRequests: UnifiedRequest[] = friendData.map(r => {
+      const isIncoming = r.receiver_id === user.id;
+      return {
+        id: r.id,
+        type: "friend",
+        title: isIncoming ? "Friend Request" : "Request Sent",
+        subtitle: isIncoming ? "Wants to connect" : "Awaiting response",
+        status: r.status === "accepted" ? "approved" : r.status as "pending" | "approved" | "rejected",
+        requester_id: isIncoming ? r.sender_id : r.receiver_id,
+        requester_name: isIncoming ? r.sender_profile?.name || "Player" : r.receiver_profile?.name || "Player",
+        created_at: r.created_at,
+        isIncoming: isIncoming
+      };
+    });
+
+    const combined = [...unifiedJoinRequests, ...unifiedFriendRequests].sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+
+    setRequests(combined);
     setFetching(false);
   };
 
@@ -32,23 +69,38 @@ function ApproveRequests() {
         navigate({ to: "/auth" });
       } else {
         setUser(session.user);
-        fetchRequests();
       }
       setLoading(false);
     });
   }, []);
 
-  const handleAction = async (id: string, requesterId: string, type: "match" | "tournament", title: string, status: "approved" | "rejected") => {
+  useEffect(() => {
+    if (user) {
+      fetchRequests();
+    }
+  }, [user]);
+
+  const handleAction = async (id: string, requesterId: string, type: "match" | "tournament" | "friend", title: string, status: "approved" | "rejected") => {
     setActioningId(id);
     try {
-      await db.updateJoinRequestStatus(id, status);
-      
-      // Notify the requester
-      const msg = status === "approved" 
-        ? `Your request to join ${type === "match" ? "match" : "tournament"} "${title}" was approved!`
-        : `Your request to join ${type === "match" ? "match" : "tournament"} "${title}" was rejected.`;
+      if (type === "friend") {
+        const friendStatus = status === "approved" ? "accepted" : "rejected";
+        await db.respondToFriendRequest(id, friendStatus);
         
-      await db.addNotification(requesterId, type, msg);
+        const msg = status === "approved" 
+          ? `${user.user_metadata?.name || "A user"} accepted your friend request!`
+          : `${user.user_metadata?.name || "A user"} rejected your friend request.`;
+        
+        await db.addNotification(requesterId, "community", msg);
+      } else {
+        await db.updateJoinRequestStatus(id, status);
+        
+        const msg = status === "approved" 
+          ? `Your request to join ${type === "match" ? "match" : "tournament"} "${title}" was approved!`
+          : `Your request to join ${type === "match" ? "match" : "tournament"} "${title}" was rejected.`;
+          
+        await db.addNotification(requesterId, type, msg);
+      }
 
       toast.success(`Request ${status} successfully!`, {
         style: {
@@ -82,9 +134,9 @@ function ApproveRequests() {
   // Filter requests
   // For incoming (to approve): either it's a mock request (system-seeded, requester_id='00000000...') OR it's a request sent to test.
   // To allow testing, any pending requests can be approved/rejected.
-  const incomingRequests = requests.filter((r) => r.status === "pending");
+  const incomingRequests = requests.filter((r) => r.status === "pending" && r.isIncoming);
   // Outgoing (your sent ones): requests sent by current user
-  const outgoingRequests = requests.filter((r) => r.requester_id === user?.id);
+  const outgoingRequests = requests.filter((r) => !r.isIncoming);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -118,22 +170,18 @@ function ApproveRequests() {
                   <div key={req.id} className="panel-game p-5 flex flex-col justify-between gap-4">
                     <div className="relative z-10 flex justify-between items-start">
                       <div>
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold text-white border border-[var(--gold)] ${req.color} mr-2`}>
-                          {req.sport}
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold text-white border border-[var(--gold)] ${req.type === 'friend' ? 'bg-[var(--brand-yellow)] text-black' : req.type === 'match' ? 'bg-[var(--brand-green)]' : 'bg-[var(--brand-blue)]'} mr-2`}>
+                          {req.type.toUpperCase()}
                         </span>
-                        <span className="badge-game !py-0.5 !px-1.5 !text-[0.65rem]">
-                          {req.type === "match" ? "Match" : "Tournament"}
-                        </span>
-                        <h3 className="text-xl font-bold mt-2 text-[color:var(--card-foreground)]">{req.title}</h3>
+                        <h3 className="text-xl font-bold mt-2 text-[color:var(--card-foreground)]">{req.type === "friend" ? `Friend Request from ${req.requester_name}` : req.title}</h3>
                         <p className="text-sm text-[color:var(--card-foreground)]/70 mt-1">
-                          Requested by: <span className="font-semibold text-white">{req.requester_name}</span>
+                          {req.type === "friend" ? `User: ${req.requester_name}` : `Requested by: ${req.requester_name}`}
                         </p>
                       </div>
                     </div>
 
                     <div className="relative z-10 flex items-center gap-2.5 text-xs text-[color:var(--card-foreground)]/80 border-t border-white/10 pt-3">
-                      <div className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {req.city} ({req.venue})</div>
-                      <div className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {req.date}</div>
+                      <div className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {req.subtitle}</div>
                     </div>
 
                     <div className="relative z-10 flex gap-2 border-t border-white/10 pt-3">
@@ -179,13 +227,10 @@ function ApproveRequests() {
                   <div key={req.id} className="panel-game p-5 flex flex-col gap-3">
                     <div className="relative z-10 flex justify-between items-start">
                       <div>
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold text-white border border-[var(--gold)] ${req.color} mr-2`}>
-                          {req.sport}
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold text-white border border-[var(--gold)] ${req.type === 'friend' ? 'bg-[var(--brand-yellow)] text-black' : req.type === 'match' ? 'bg-[var(--brand-green)]' : 'bg-[var(--brand-blue)]'} mr-2`}>
+                          {req.type.toUpperCase()}
                         </span>
-                        <span className="badge-game !py-0.5 !px-1.5 !text-[0.65rem]">
-                          {req.type === "match" ? "Match" : "Tournament"}
-                        </span>
-                        <h3 className="text-lg font-bold mt-2 text-[color:var(--card-foreground)]">{req.title}</h3>
+                        <h3 className="text-lg font-bold mt-2 text-[color:var(--card-foreground)]">{req.type === "friend" ? `Friend Request to ${req.title}` : req.title}</h3>
                       </div>
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-bold border-2 ${
@@ -205,8 +250,7 @@ function ApproveRequests() {
                     </div>
 
                     <div className="relative z-10 flex items-center gap-2 text-xs text-[color:var(--card-foreground)]/80 border-t border-white/10 pt-3">
-                      <div className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {req.city} ({req.venue})</div>
-                      <div className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {req.date}</div>
+                      <div className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {req.subtitle}</div>
                     </div>
                   </div>
                 ))

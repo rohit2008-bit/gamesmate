@@ -38,6 +38,8 @@ const sportsOptions = [
   "Badminton",
   "Table Tennis",
   "Volleyball",
+  "Chess",
+  "Carrom",
   "Other"
 ];
 
@@ -85,9 +87,10 @@ function Profile() {
           const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
           
           if (profile) {
-            setName(profile.name || session.user.email?.split("@")[0] || "Player One");
-            setCity(profile.city || "");
-            setSport(profile.preferred_sport || "Cricket");
+            const meta = session.user.user_metadata || {};
+            setName(profile.name || meta.name || session.user.email?.split("@")[0] || "Player One");
+            setCity(profile.city || meta.city || "");
+            setSport(profile.preferred_sport || meta.preferred_sport || "Cricket");
             setCurrentTeam(profile.current_team || "");
             setMatchesPlayed(profile.matches_played || 0);
             setTournamentsPlayed(profile.tournaments_played || 0);
@@ -96,19 +99,32 @@ function Profile() {
             setIsPro(profile.pro_subscription || false);
             setAvatarUrl(profile.avatar_url || "");
             
-            let gameUid = profile.game_uid;
-            if (!gameUid && !initializingUid.current) {
-              initializingUid.current = true;
+            let gameUid = profile.game_uid || meta.uid;
+            if (!gameUid) {
               gameUid = "MATE-" + Math.random().toString(36).substring(2, 8).toUpperCase();
-              await supabase.from('profiles').update({ game_uid: gameUid }).eq('id', session.user.id);
-              await supabase.auth.updateUser({ data: { uid: gameUid } });
+              if (!initializingUid.current) {
+                initializingUid.current = true;
+                supabase.auth.updateUser({ data: { uid: gameUid } }).then(({error}) => error && console.error(error));
+                supabase.from('profiles').update({ game_uid: gameUid, city: profile.city || meta.city }).eq('id', session.user.id).then(({error}) => error && console.error(error));
+              }
             }
-            setUid(gameUid || "");
+            setUid(gameUid);
           } else {
             // Fallback for new signups where trigger might be slightly delayed
-            const meta: UserMetadata = session.user.user_metadata || {};
+            const meta = session.user.user_metadata || {};
             setName(meta.name || session.user.email?.split("@")[0] || "Player One");
             setCity(meta.city || "");
+            
+            let fallbackUid = meta.uid;
+            if (!fallbackUid) {
+              fallbackUid = "MATE-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+              if (!initializingUid.current) {
+                initializingUid.current = true;
+                supabase.auth.updateUser({ data: { uid: fallbackUid } }).then(({error}) => error && console.error(error));
+              }
+            }
+            setUid(fallbackUid);
+            setSport(meta.preferred_sport || "Cricket");
           }
           setLoading(false);
         };
@@ -377,7 +393,7 @@ function Profile() {
                   </button>
                 </div>
                 <div className="flex items-center justify-center gap-1.5 text-xs text-[color:var(--card-foreground)]/70 mt-1 font-bold">
-                  <MapPin className="w-3.5 h-3.5" /> {city}
+                  <MapPin className="w-3.5 h-3.5" /> {city || "Location not set"}
                 </div>
 
                 {/* Team Tag */}

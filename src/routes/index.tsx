@@ -1,8 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Trophy, Users, Calendar, Zap, Crown, Activity, Target, Medal, ShieldCheck } from "lucide-react";
 import hero from "@/assets/hero.png";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -37,6 +39,16 @@ const ranks = [
 ];
 
 function Landing() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate({ to: "/discover" });
+      }
+    });
+  }, [navigate]);
+
   return (
     <div className="min-h-screen">
       <SiteHeader />
